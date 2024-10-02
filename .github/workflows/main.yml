@@ -9,12 +9,13 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
-    name: Ruby ${{ matrix.ruby }}
+    name: CI (${{ matrix.ruby }} / ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         ruby:
           - '3.3.0'
+        os: [ ubuntu-latest, windows-latest ]
 
     steps:
     - uses: actions/checkout@v4
