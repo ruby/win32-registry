@@ -3,7 +3,22 @@
 require "test_helper"
 
 class Win32::TestRegistry < Minitest::Test
+  COMPUTERNAME = 'SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName'
+  VOLATILE_ENVIRONMENT = 'Volatile Environment'
+
   include RegistryHelper
+
+  def test_predefined
+    assert_predefined_key Win32::Registry::HKEY_CLASSES_ROOT
+    assert_predefined_key Win32::Registry::HKEY_CURRENT_USER
+    assert_predefined_key Win32::Registry::HKEY_LOCAL_MACHINE
+    assert_predefined_key Win32::Registry::HKEY_USERS
+    assert_predefined_key Win32::Registry::HKEY_PERFORMANCE_DATA
+    assert_predefined_key Win32::Registry::HKEY_PERFORMANCE_TEXT
+    assert_predefined_key Win32::Registry::HKEY_PERFORMANCE_NLSTEXT
+    assert_predefined_key Win32::Registry::HKEY_CURRENT_CONFIG
+    assert_predefined_key Win32::Registry::HKEY_DYN_DATA
+  end
 
   def test_open_no_block
     Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY)).close
@@ -37,6 +52,37 @@ class Win32::TestRegistry < Minitest::Test
     end
   end
 
+  def test_class_open
+    name1, keys1 = Win32::Registry.open(Win32::Registry::HKEY_LOCAL_MACHINE, "SYSTEM") do |reg|
+      assert_predicate reg, :open?
+      [reg.name, reg.keys]
+    end
+    name2, keys2 = Win32::Registry::HKEY_LOCAL_MACHINE.open("SYSTEM") do |reg|
+      assert_predicate reg, :open?
+      [reg.name, reg.keys]
+    end
+    assert_equal name1, name2
+    assert_equal keys1, keys2
+  end
+
+  def test_read
+    computername = ENV['COMPUTERNAME']
+    Win32::Registry::HKEY_LOCAL_MACHINE.open(COMPUTERNAME) do |reg|
+      assert_equal computername,  reg['ComputerName']
+      assert_equal [Win32::Registry::REG_SZ, computername], reg.read('ComputerName')
+      assert_raises(TypeError) {reg.read('ComputerName', Win32::Registry::REG_DWORD)}
+    end
+  end
+
+  def test_create_volatile
+    desired = Win32::Registry::KEY_ALL_ACCESS
+    option = Win32::Registry::REG_OPTION_VOLATILE
+    Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY), desired) do |reg|
+      reg.create("volkey", desired, option) {}
+      reg.delete_key("volkey", true)
+    end
+  end
+
   def test_create_no_block
     reg = Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY))
     assert_kind_of Win32::Registry, reg
@@ -64,6 +110,16 @@ class Win32::TestRegistry < Minitest::Test
     assert_equal false, regs[0].open?
     assert_raises(Win32::Registry::Error) do
       regs[0]["test"] = "abc"
+    end
+  end
+
+  def test_write
+    desired = Win32::Registry::KEY_ALL_ACCESS
+    Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY), desired) do |reg|
+      reg.write_s("key1", "data")
+      assert_equal [Win32::Registry::REG_SZ, "data"], reg.read("key1")
+      reg.write_i("key2", 0x5fe79027)
+      assert_equal [Win32::Registry::REG_DWORD, 0x5fe79027], reg.read("key2")
     end
   end
 
@@ -159,4 +215,11 @@ class Win32::TestRegistry < Minitest::Test
     assert_equal ["abc EUR", "abc €"], keys
   end
 
+  private
+
+  def assert_predefined_key(key)
+    assert_kind_of Win32::Registry, key
+    assert_predicate key, :open?
+    refute_predicate key, :created?
+  end
 end
