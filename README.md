@@ -1,24 +1,47 @@
 # Win32::Registry
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/win32/registry`. To experiment with that code, run `bin/console` for an interactive prompt.
+win32-registry is registry accessor library for the Windows platform.
+It uses Fiddle to call Windows Registry APIs.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+win32-registry is a bundled gem of the ruby standard library, so that the latest version on the ruby release date is preinstalled on Windows.
+Other versions of the gem can be installed in addition like so:
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add win32-registry
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install win32-registry
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+  require "win32/registry"
+
+  Win32::Registry::HKEY_CURRENT_USER.open('SOFTWARE\foo') do |reg|
+    value = reg['foo']                               # read a value
+    value = reg['foo', Win32::Registry::REG_SZ]      # read a value with type
+    type, value = reg.read('foo')                    # read a value
+    reg['foo'] = 'bar'                               # write a value
+    reg['foo', Win32::Registry::REG_SZ] = 'bar'      # write a value with type
+    reg.write('foo', Win32::Registry::REG_SZ, 'bar') # write a value
+
+    reg.each_value { |name, type, data| ... }        # Enumerate values
+    reg.each_key { |key, wtime| ... }                # Enumerate subkeys
+
+    reg.delete_value(name)                         # Delete a value
+    reg.delete_key(name)                           # Delete a subkey
+    reg.delete_key(name, true)                     # Delete a subkey recursively
+  end
+```
+
+Be sure to use backslashs "\\" as path separator.
+Forward slashs "/" will not work.
+This is in contrast to file paths, which accept forward and backward slashs at will on Windows.
+
 
 ## Development
 
@@ -28,4 +51,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/win32-registry.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ruby/win32-registry.
