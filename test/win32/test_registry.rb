@@ -101,6 +101,20 @@ class Win32::TestRegistry < Minitest::Test
     assert_in_delta Win32::Registry.time2wtime(Time.now), keys[0][1], 10_000_000_000, "wtime should roughly match Time.now"
   end
 
+  def test_each_key_enum
+    keys = nil
+    Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY)) do |reg|
+      reg.create("key1")
+      reg.create("key2")
+      reg.create("key3")
+      reg["value1"] = "abcd"
+      keys = reg.each_key.to_a
+    end
+    assert_equal 3, keys.size
+    assert_equal [2, 2, 2], keys.map(&:size)
+    assert_equal ["key1", "key2", "key3"], keys.map(&:first)
+  end
+
   def test_values
     Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY)) do |reg|
       reg.create("key1")
@@ -117,6 +131,18 @@ class Win32::TestRegistry < Minitest::Test
       reg.each_value { |*a| vals << a }
     end
     assert_equal [["value1", Win32::Registry::REG_SZ, "abcd"]], vals
+  end
+
+  def test_each_value_enum
+    vals = nil
+    Win32::Registry::HKEY_CURRENT_USER.create(backslachs(TEST_REGISTRY_KEY)) do |reg|
+      reg.create("key1")
+      reg["value1"] = "abcd"
+      reg["value2"] = 42
+      vals = reg.each_value.to_a
+    end
+    assert_equal [["value1", Win32::Registry::REG_SZ, "abcd"],
+                  ["value2", Win32::Registry::REG_DWORD, 42]], vals
   end
 
   def test_utf8_encoding
