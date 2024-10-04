@@ -12,7 +12,6 @@ end
 if defined?(Win32::Registry)
   class TestWin32Registry < Test::Unit::TestCase
     COMPUTERNAME = 'SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName'
-    VOLATILE_ENVIRONMENT = 'Volatile Environment'
 
     private def backslachs(path)
       path.gsub("/", "\\")
