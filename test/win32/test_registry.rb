@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 if /mswin|mingw|cygwin/ =~ RUBY_PLATFORM
-  require "win32/registry"
-  require "test/unit"
+  begin
+    require 'win32/registry'
+  rescue LoadError
+  else
+    require 'test/unit'
+  end
 end
 
 if defined?(Win32::Registry)
