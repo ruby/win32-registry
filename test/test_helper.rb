@@ -4,7 +4,7 @@ if /mswin|mingw|cygwin/ =~ RUBY_PLATFORM
 
   $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
   require "win32/registry"
-  require "minitest/autorun"
+  require "test/unit"
 
   module RegistryHelper
     private def backslachs(path)

@@ -3,7 +3,7 @@
 require "test_helper"
 
 if defined?(Win32::Registry)
-  class Win32::TestRegistry < Minitest::Test
+  class Win32::TestRegistry < Test::Unit::TestCase
     COMPUTERNAME = 'SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName'
     VOLATILE_ENVIRONMENT = 'Volatile Environment'
 
@@ -30,7 +30,7 @@ if defined?(Win32::Registry)
       assert_equal false, reg.created?
       reg["test"] = "abc"
       reg.close
-      assert_raises(Win32::Registry::Error) do
+      assert_raise(Win32::Registry::Error) do
         reg["test"] = "abc"
       end
     end
@@ -48,7 +48,7 @@ if defined?(Win32::Registry)
 
       assert_equal 1, regs.size
       assert_kind_of Win32::Registry, regs[0]
-      assert_raises(Win32::Registry::Error) do
+      assert_raise(Win32::Registry::Error) do
         regs[0]["test"] = "abc"
       end
     end
@@ -71,7 +71,7 @@ if defined?(Win32::Registry)
       Win32::Registry::HKEY_LOCAL_MACHINE.open(COMPUTERNAME) do |reg|
         assert_equal computername,  reg['ComputerName']
         assert_equal [Win32::Registry::REG_SZ, computername], reg.read('ComputerName')
-        assert_raises(TypeError) {reg.read('ComputerName', Win32::Registry::REG_DWORD)}
+        assert_raise(TypeError) {reg.read('ComputerName', Win32::Registry::REG_DWORD)}
       end
     end
 
@@ -92,7 +92,7 @@ if defined?(Win32::Registry)
       reg["test"] = "abc"
       reg.close
       assert_equal false, reg.open?
-      assert_raises(Win32::Registry::Error) do
+      assert_raise(Win32::Registry::Error) do
         reg["test"] = "abc"
       end
     end
@@ -109,7 +109,7 @@ if defined?(Win32::Registry)
       assert_equal 1, regs.size
       assert_kind_of Win32::Registry, regs[0]
       assert_equal false, regs[0].open?
-      assert_raises(Win32::Registry::Error) do
+      assert_raise(Win32::Registry::Error) do
         regs[0]["test"] = "abc"
       end
     end
