@@ -1,13 +1,27 @@
 # frozen_string_literal: true
 
-require "test_helper"
+if /mswin|mingw|cygwin/ =~ RUBY_PLATFORM
+  require "win32/registry"
+  require "test/unit"
+end
 
 if defined?(Win32::Registry)
   class Win32::TestRegistry < Test::Unit::TestCase
     COMPUTERNAME = 'SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName'
     VOLATILE_ENVIRONMENT = 'Volatile Environment'
 
-    include RegistryHelper
+    private def backslachs(path)
+      path.gsub("/", "\\")
+    end
+
+    TEST_REGISTRY_KEY = "SOFTWARE/ruby-win32-registry-test/"
+
+    def setup
+      Win32::Registry::HKEY_CURRENT_USER.open(backslachs(File.dirname(TEST_REGISTRY_KEY))) do |reg|
+        reg.delete_key File.basename(TEST_REGISTRY_KEY), true
+      end
+    rescue Win32::Registry::Error
+    end
 
     def test_predefined
       assert_predefined_key Win32::Registry::HKEY_CLASSES_ROOT
