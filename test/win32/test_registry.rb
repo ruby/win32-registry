@@ -6,7 +6,7 @@ if /mswin|mingw|cygwin/ =~ RUBY_PLATFORM
 end
 
 if defined?(Win32::Registry)
-  class Win32::TestRegistry < Test::Unit::TestCase
+  class TestWin32Registry < Test::Unit::TestCase
     COMPUTERNAME = 'SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName'
     VOLATILE_ENVIRONMENT = 'Volatile Environment'
 
