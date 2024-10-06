@@ -8,13 +8,20 @@ on:
   pull_request:
 
 jobs:
+  ruby-versions:
+    if: ${{ startsWith(github.repository, 'ruby/') || github.event_name != 'schedule' }}
+    uses: ruby/actions/.github/workflows/ruby_versions.yml@master
+    with:
+      engine: cruby
+      min_version: 3.3
+
   build:
+    needs: ruby-versions
     name: CI (${{ matrix.ruby }} / ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        ruby:
-          - '3.3.0'
+        ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
         os: [ ubuntu-latest, windows-latest ]
 
     steps:
