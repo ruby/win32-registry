@@ -10,11 +10,15 @@ Other versions of the gem can be installed in addition like so:
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add win32-registry
+  ```bash
+  bundle add win32-registry
+  ```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install win32-registry
+  ```bash
+  gem install win32-registry
+  ```
 
 ## Usage
 
@@ -38,10 +42,8 @@ If bundler is not being used to manage dependencies, install the gem by executin
   end
 ```
 
-Be sure to use backslashs "\\" as path separator.
-Forward slashs "/" will not work.
-This is in contrast to file paths, which accept forward and backward slashs at will on Windows.
-
+Be sure to use backslashes "\\" as the path separator. Forward slashes "/" will not work.
+This is in contrast to file paths, which accept forward and backward slashes at will on Windows.
 
 ## Development
 
