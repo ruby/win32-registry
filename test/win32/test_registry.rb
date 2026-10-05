@@ -43,6 +43,7 @@ if defined?(Win32::Registry)
     end
 
     def teardown
+      return unless @test_registry_rnd
       Win32::Registry::HKEY_CURRENT_USER.open(TEST_REGISTRY_PATH) do |reg|
         reg.delete_key @test_registry_rnd, true
       end
