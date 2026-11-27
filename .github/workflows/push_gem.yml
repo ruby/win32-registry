@@ -30,13 +30,13 @@ jobs:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@a6e6f86333f0a2523ece813039b8b4be04560854 # v1.190.0
+        uses: ruby/setup-ruby@145243922b4465b78e04dd66294782c7de45901f # v1.345.0
         with:
           bundler-cache: true
           ruby-version: ruby
 
       - name: Publish to RubyGems
-        uses: rubygems/release-gem@612653d273a73bdae1df8453e090060bb4db5f31 # v1
+        uses: rubygems/release-gem@2654a0fe0dc39725c07fe84d7fe863a084f2424e # v1.5.0
 
       - name: Create GitHub release
         run: |
